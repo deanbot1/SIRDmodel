@@ -1,7 +1,7 @@
 require(ggplot2)
 require(deSolve)
 
-SIRDsim <- function(phixsi=0.25,txsi=30,hsc=0.1,I0=0.01,MTT=7,xsi=2,d=0.08,phid=2){
+SIRDsim <- function(phixsi=0.25,txsi=30,hsc=0.1,I0=0.01,MTT=7,xsi=2,d=0.08,phid=2,autoscale=TRUE){
 
 parameters<-c(MTT=MTT,xsi=xsi,phixsi=phixsi,txsi=txsi,d=d,phid=phid,h=hsc)
 # MTT = "mean transit time" of disease in infected stage (days)
@@ -17,6 +17,8 @@ state<-c(S=1-I0,I=I0,R=0,D=0)
 # I = Infected population fraction (dimensionless)
 # R = Recovered population fraction (dimensionless)
 # D = Deceased population fraction (dimensionless)
+
+popsize <- 10000 # hypothetical population size (doesn't change anything)
 
 SIRDode <- function(t,state,parameters){
   with(as.list(c(state,parameters)),{
@@ -39,15 +41,19 @@ times<-seq(0,100,by=0.1)
 out<-ode(y=state,times=times,func=SIRDode,parms=parameters)
 outf <-as.data.frame(out)
 T <- c(times,times,times,times)
-Y <- 100*c(outf$S,outf$I,outf$R,outf$D)
+Y <- popsize*c(outf$S,outf$I,outf$R,outf$D)
 G <- c(rep('Susceptible',times=length(times)),rep('Infected',times=length(times)),rep('Recovered',times=length(times)),rep('Deceased',times=length(times)))
 outff <- data.frame(T,Y,G)
 outff$G <- factor(outff$G,levels=c('Susceptible','Recovered','Deceased','Infected'))
 
-ggplot(outff,aes(x=T,y=Y,fill=G)) + geom_area() + geom_hline(yintercept=100*hsc,linetype='dashed',color='black') + 
-  ggtitle(paste("Simulated scenario results in ", round(outf$D[length(times)]*100,digits=2),'% of population Deceased')) + 
-  xlab('days') + ylab('% of population') +
-  scale_fill_manual(values=c('green','yellow','red','purple'))
+ylim <- c(0,popsize)
+if(autoscale==TRUE){ylim<-c(0,1.1*max(max(popsize*(outf$I + outf$D)),popsize*hsc))}
+
+ggplot(outff,aes(x=T,y=Y,fill=G)) + geom_area() + geom_hline(yintercept=popsize*hsc,linetype='dashed',color='black') + 
+  ggtitle(paste("Hypothetical scenario results in ", round(outf$D[length(times)]*popsize,digits=0),' of ', popsize, ' Deceased after ',max(times),' days')) + 
+  xlab('days') + ylab('number of cases') + theme(plot.title=element_text(face='bold',color='red',hjust=0.5)) +
+  scale_fill_manual(values=c('green','yellow','red','purple')) + 
+  coord_cartesian(xlim=c(min(times),max(times)),ylim=ylim)
 
 
 }
