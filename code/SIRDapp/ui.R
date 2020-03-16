@@ -14,7 +14,7 @@ shinyUI(fluidPage(
   
   # Application title
   titlePanel("Infection Simulator: Flattening the Curve"),
-  p("Disclaimer: this simulation tutorial as parameterized does not reflect any known transmissible disease. It exists only to illustrate the potential impact of safe behavior, and delay therof, on mortality count from a fictitious disease in a hypothetical population of 10000 individuals."),
+  p("Disclaimer: this simulation tutorial as parameterized does not reflect any known transmissible disease. It exists only to illustrate the potential impact of safe behavior (ie social distancing), and delay therof, on mortality count from a fictitious disease in a hypothetical population of 10000 individuals."),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -40,26 +40,31 @@ shinyUI(fluidPage(
       
       h3("Givens--factors out of our immediate control:"),
 
-
+      numericInput("Npop",
+                   "Total population size (>99)",
+                   min = 100,
+                   max = 1e10,
+                   value = 10000),
       
       sliderInput("I0",
-                  "Initially infected (%pop)",
+                  "Initially infected (% of pop)",
                   min=0,
                   max=10,
-                  value = 1),
+                  value = 1,
+                  step = 0.01),
       
       sliderInput("xsi",
                   "Baseline infection transmission efficiency (1/day)",
                   min = 0,
                   max = 5,
-                  value = 1.8,
+                  value = 0.8,
                   step = .1),
       
       sliderInput("MTT",
                   "mean infection duration (days)",
                   min=1,
                   max=21,
-                  value=7), 
+                  value=14), 
       
       sliderInput("d",
                   "Death rate among infected (1/day)",
@@ -70,8 +75,9 @@ shinyUI(fluidPage(
       sliderInput("hsc",
                   "Healthcare system capacity (%pop)",
                   min=0,
-                  max=100,
-                  value = 10),    
+                  max=10,
+                  value = 5,
+                  step=0.1),    
       
       sliderInput("phid",
                   "How much more likely infected people are to die if they can't get hospital beds",
@@ -84,11 +90,22 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
     mainPanel(
        plotOutput("SIRDPlot"),
-       p("------Dashed line represents healthcare system capacity"),
+       p("------ Horizontal dashed line represents healthcare system capacity"),
+       p("------ Vertical dashed line represents start of safer behavior"),
        h3("Scenarios to try:"),
        p("What happens to the death total if we wait 3 days before acting safer (top slider)? Is there a big difference? Then try 7 days."),
        p("How much safer do we have to act (how far do we need to move the second slider to the left) to offset a 3 day delay in acting safer?"),
-       p("Try changing the key parameters of this fictitious disease ('givens') and see how that affects the answers above.")
+       p("Try changing the key parameters of this fictitious disease ('givens') and see how that affects the answers above."),
+       h3("Model assumptions:"),
+       p("Square brackets [] denote a slider parameter value"),
+       p("1.Population is well-mixed. There are 4 fractions of the initial population: Susceptible, Infected, Recovered, Deceased"),
+       p("2.Initially there are zero Recovered or Deceased individuals, [Initially Infected]*Npop Infected, and the remainder are Susceptible."),
+       p("3.Infections propagate at a rate = [baseline infection transmission efficiency] * fraction Infected * fraction Susceptible"),
+       p("4.Infections last about [mean infection duration] days before the infected person either recovers or dies"),
+       p("5.Recovered patients cannot be infected again"),
+       p("6.Infected persons die at a rate = [death rate among infected]*Infected as long as [health system capacity] has not been exceeded."),
+       p("7.Once [health system capacity] has been exceeded, the death rate for the 'excess' infected gets multiplied by the factor: [How much more likely...]"),
+       p("8.After [Days to wait before acting safer] days have passed, social distancing commences and the effective transmission rate is now multiplied by the fraction:[Acting safer impact on disease transmission efficiency]")
     )
   )
 ))

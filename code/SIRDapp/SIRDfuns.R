@@ -1,7 +1,7 @@
 require(ggplot2)
 require(deSolve)
 
-SIRDsim <- function(phixsi=0.25,txsi=30,hsc=0.1,I0=0.01,MTT=7,xsi=2,d=0.08,phid=2,autoscale=TRUE){
+SIRDsim <- function(popsize=10000,phixsi=0.25,txsi=30,hsc=0.1,I0=0.01,MTT=7,xsi=2,d=0.08,phid=2,autoscale=TRUE){
 
 parameters<-c(MTT=MTT,xsi=xsi,phixsi=phixsi,txsi=txsi,d=d,phid=phid,h=hsc)
 # MTT = "mean transit time" of disease in infected stage (days)
@@ -18,7 +18,7 @@ state<-c(S=1-I0,I=I0,R=0,D=0)
 # R = Recovered population fraction (dimensionless)
 # D = Deceased population fraction (dimensionless)
 
-popsize <- 10000 # hypothetical population size (doesn't change anything)
+#popsize <- 10000 # hypothetical population size (doesn't change anything)
 
 SIRDode <- function(t,state,parameters){
   with(as.list(c(state,parameters)),{
@@ -53,7 +53,8 @@ ggplot(outff,aes(x=T,y=Y,fill=G)) + geom_area() + geom_hline(yintercept=popsize*
   ggtitle(paste("Hypothetical scenario results in ", round(outf$D[length(times)]*popsize,digits=0),' of ', popsize, ' Deceased after ',max(times),' days')) + 
   xlab('days') + ylab('number of cases') + theme(plot.title=element_text(face='bold',color='red',hjust=0.5)) +
   scale_fill_manual(values=c('green','yellow','red','purple')) + 
-  coord_cartesian(xlim=c(min(times),max(times)),ylim=ylim)
+  coord_cartesian(xlim=c(min(times),max(times)),ylim=ylim) +
+  geom_vline(xintercept=txsi,linetype='dashed',color='black')
 
 
 }
