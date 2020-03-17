@@ -35,7 +35,7 @@ shinyUI(fluidPage(
                    "Acting safer impact on disease transmission efficiency",
                    min = 0,
                    max = 1,
-                   value = .23),
+                   value = 0.5),
       hr(),
       
       h3("Givens--factors out of our immediate control:"),
@@ -57,7 +57,7 @@ shinyUI(fluidPage(
                   "Baseline infection transmission efficiency (1/day)",
                   min = 0,
                   max = 10,
-                  value = 8.9,
+                  value = 4.1,
                   step = .1),
       
       sliderInput("MTT",
