@@ -28,33 +28,44 @@ SIRDode <- function(t,state,parameters){
        if(t>txsi){xxx<-xsi*phixsi}
        delt <- d*(min(I,h)+phid*max(0,I-h)) # only the infected in excess of hsc experience elevated death rate
        dSdt <- -xxx*I*S
-       dIdt <-  xxx*I*S - k*I
-       dRdt <- (1-delt)*k*I
-       dDdt <- delt*k*I
+       dIdt <-  xxx*I*S - k*I - delt
+       dRdt <- k*I
+       dDdt <- delt
        
        list(c(dSdt,dIdt,dRdt,dDdt))
   })
 }
 
-times<-seq(0,100,by=0.1)
+times<-seq(0,200,by=0.1)
 
 out<-ode(y=state,times=times,func=SIRDode,parms=parameters)
 outf <-as.data.frame(out)
+#outf$R <- 1-outf$S-outf$I-outf$D # conservation law
 T <- c(times,times,times,times)
 Y <- popsize*c(outf$S,outf$I,outf$R,outf$D)
 G <- c(rep('Susceptible',times=length(times)),rep('Infected',times=length(times)),rep('Recovered',times=length(times)),rep('Deceased',times=length(times)))
 outff <- data.frame(T,Y,G)
 outff$G <- factor(outff$G,levels=c('Susceptible','Recovered','Deceased','Infected'))
 
-ylim <- c(0,popsize)
-if(autoscale==TRUE){ylim<-c(0,1.1*max(max(popsize*(outf$I + outf$D)),popsize*hsc))}
+ylim <- c(0.5,popsize)
+if(autoscale==TRUE){ylim<-c(0.5,1.1*max(max(popsize*(outf$I + outf$D)),popsize*hsc))}
 
-ggplot(outff,aes(x=T,y=Y,fill=G)) + geom_area() + geom_hline(yintercept=popsize*hsc,linetype='dashed',color='black') + 
+require(scales)
+options(scipen=999)
+
+ggplot(outff,aes(x=T,y=Y,color=G)) + geom_line(size=2) + geom_hline(yintercept=popsize*hsc,linetype='dashed',color='black') + 
   ggtitle(paste("Hypothetical scenario results in ", round(outf$D[length(times)]*popsize,digits=0),' of ', popsize, ' Deceased after ',max(times),' days')) + 
   xlab('days') + ylab('number of cases') + theme(plot.title=element_text(face='bold',color='red',hjust=0.5)) +
-  scale_fill_manual(values=c('green','yellow','red','purple')) + 
+  #scale_fill_manual(values=c('green','yellow','red','purple')) + 
   coord_cartesian(xlim=c(min(times),max(times)),ylim=ylim) +
-  geom_vline(xintercept=txsi,linetype='dashed',color='black')
+  geom_vline(xintercept=txsi,linetype='dashed',color='black') + scale_y_log10(labels=comma,breaks=10.^(0:ceiling(log10(popsize)))) 
+
+# ggplot(outff,aes(x=T,y=Y,fill=G)) + geom_area() + geom_hline(yintercept=popsize*hsc,linetype='dashed',color='black') + 
+#   ggtitle(paste("Hypothetical scenario results in ", round(outf$D[length(times)]*popsize,digits=0),' of ', popsize, ' Deceased after ',max(times),' days')) + 
+#   xlab('days') + ylab('number of cases') + theme(plot.title=element_text(face='bold',color='red',hjust=0.5)) +
+#   scale_fill_manual(values=c('green','yellow','red','purple')) + 
+#   coord_cartesian(xlim=c(min(times),max(times)),ylim=ylim) +
+#   geom_vline(xintercept=txsi,linetype='dashed',color='black')
 
 
 }
