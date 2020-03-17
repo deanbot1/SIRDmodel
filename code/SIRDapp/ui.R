@@ -14,7 +14,7 @@ shinyUI(fluidPage(
   
   # Application title
   titlePanel("Infection Simulator: Flattening the Curve"),
-  p("Disclaimer: this simulation tutorial as parameterized does not reflect any known transmissible disease. It exists only to illustrate the potential impact of safe behavior (ie social distancing), and delay therof, on mortality count from a fictitious disease in a hypothetical population of 10000 individuals."),
+  p("Disclaimer: this simulation tutorial as parameterized does not reflect any known transmissible disease. It exists only to illustrate the potential impact of safe behavior (ie social distancing), and delay therof, on mortality count from a fictitious disease in a hypothetical population."),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
@@ -60,11 +60,11 @@ shinyUI(fluidPage(
                   value = 4.1,
                   step = .1),
       
-      sliderInput("MTT",
-                  "inverse recovery rate (day)",
-                  min=0.1,
-                  max=14,
-                  value=1,
+      sliderInput("RR",
+                  "recovery rate (1/day)",
+                  min=0,
+                  max=10,
+                  value=2,
                   step=0.1), 
       
       sliderInput("d",

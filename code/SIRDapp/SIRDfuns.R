@@ -1,10 +1,10 @@
 require(ggplot2)
 require(deSolve)
 
-SIRDsim <- function(popsize=10000,phixsi=0.25,txsi=30,hsc=0.1,I0=0.01,MTT=7,xsi=2,d=0.08,phid=2,autoscale=TRUE){
+SIRDsim <- function(popsize=10000,phixsi=0.25,txsi=30,hsc=0.1,I0=0.01,kr=1,xsi=2,d=0.08,phid=2,autoscale=TRUE){
 
-parameters<-c(MTT=MTT,xsi=xsi,phixsi=phixsi,txsi=txsi,d=d,phid=phid,h=hsc)
-# MTT = "mean transit time" of disease in infected stage (days)
+parameters<-c(kr=kr,xsi=xsi,phixsi=phixsi,txsi=txsi,d=d,phid=phid,h=hsc)
+# kr = recovery rate (1/day)
 # xsi = efficiency of transmission from infected to susceptible (1/day)
 # phixsi = safeness multiplier on xsi (fraction)
 # txsi = days of delay before people start acting safely (days)
@@ -23,13 +23,12 @@ state<-c(S=1-I0,I=I0,R=0,D=0)
 SIRDode <- function(t,state,parameters){
   with(as.list(c(state,parameters)),{
        
-       k    <-2/MTT 
        xxx <- xsi
        if(t>txsi){xxx<-xsi*phixsi}
        delt <- d*(min(I,h)+phid*max(0,I-h)) # only the infected in excess of hsc experience elevated death rate
        dSdt <- -xxx*I*S
-       dIdt <-  xxx*I*S - k*I - delt
-       dRdt <- k*I
+       dIdt <-  xxx*I*S - kr*I - delt
+       dRdt <- kr*I
        dDdt <- delt
        
        list(c(dSdt,dIdt,dRdt,dDdt))
