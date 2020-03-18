@@ -1,6 +1,21 @@
 require(ggplot2)
 require(deSolve)
 
+SIRDode <- function(t,state,parameters){
+  with(as.list(c(state,parameters)),{
+    
+    xxx <- xsi
+    if(t>txsi){xxx<-xsi*phixsi}
+    delt <- d*(min(I,h)+phid*max(0,I-h)) # only the infected in excess of hsc experience elevated death rate
+    dSdt <- -xxx*I*S
+    dIdt <-  xxx*I*S - kr*I - delt
+    dRdt <- kr*I
+    dDdt <- delt
+    
+    list(c(dSdt,dIdt,dRdt,dDdt))
+  })
+}
+
 SIRDsim <- function(popsize=10000,phixsi=0.25,txsi=30,hsc=0.1,I0=0.01,kr=1,xsi=2,d=0.08,phid=2,autoscale=TRUE){
 
 parameters<-c(kr=kr,xsi=xsi,phixsi=phixsi,txsi=txsi,d=d,phid=phid,h=hsc)
@@ -17,23 +32,6 @@ state<-c(S=1-I0,I=I0,R=0,D=0)
 # I = Infected population fraction (dimensionless)
 # R = Recovered population fraction (dimensionless)
 # D = Deceased population fraction (dimensionless)
-
-#popsize <- 10000 # hypothetical population size (doesn't change anything)
-
-SIRDode <- function(t,state,parameters){
-  with(as.list(c(state,parameters)),{
-       
-       xxx <- xsi
-       if(t>txsi){xxx<-xsi*phixsi}
-       delt <- d*(min(I,h)+phid*max(0,I-h)) # only the infected in excess of hsc experience elevated death rate
-       dSdt <- -xxx*I*S
-       dIdt <-  xxx*I*S - kr*I - delt
-       dRdt <- kr*I
-       dDdt <- delt
-       
-       list(c(dSdt,dIdt,dRdt,dDdt))
-  })
-}
 
 times<-seq(0,200,by=0.1)
 
