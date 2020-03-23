@@ -24,6 +24,10 @@ shinyUI(fluidPage(
                     "Auto-scale Y axis (scarier)",
                     value=FALSE),
       
+      checkboxInput("logscale",
+                    "log scale Y axis (better)",
+                    value=TRUE),
+      
       h3("Levers--factors we can change:"),
          sliderInput("txsi",
                    "Days to wait before acting safer",
@@ -94,6 +98,7 @@ shinyUI(fluidPage(
        plotOutput("SIRDPlot"),
        p("------ Horizontal dashed line represents healthcare system capacity"),
        p("------ Vertical dashed line represents start of safer behavior"),
+       p("Note that areas are not stacked; they are overlapping"),
        h3("Scenarios to try:"),
        p("What happens to the death total if we wait 3 days before acting safer (top slider)? Is there a big difference? Then try 7 days."),
        p("How much safer do we have to act (how far do we need to move the second slider to the left) to offset a 3 day delay in acting safer?"),

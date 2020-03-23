@@ -16,7 +16,7 @@ shinyServer(function(input, output) {
    
   output$SIRDPlot <- renderPlot({
     
-  SIRDsim(popsize=input$Npop,phixsi=input$phixsi,txsi=input$txsi,xsi=input$xsi,hsc=input$hsc/100,I0=input$I0/input$Npop,d=input$d,kr=input$RR,phid=input$phid,autoscale=input$scaleflag)
+  SIRDsim(popsize=input$Npop,phixsi=input$phixsi,txsi=input$txsi,xsi=input$xsi,hsc=input$hsc/100,I0=input$I0/input$Npop,d=input$d,kr=input$RR,phid=input$phid,autoscale=input$scaleflag,logscale=input$logscale)
     
   })
   
