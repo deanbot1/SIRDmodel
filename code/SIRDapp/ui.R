@@ -64,12 +64,21 @@ shinyUI(fluidPage(
                   value = 4.1,
                   step = .1),
       
+      
+      sliderInput("mabd",
+                  "rate of loss of Ab protection (1/day)",
+                  min=0,
+                  max=0.1,
+                  value=0,
+                  step=0.001),  
+      
       sliderInput("RR",
                   "recovery rate (1/day)",
                   min=0,
                   max=10,
                   value=2,
                   step=0.1), 
+
       
       sliderInput("d",
                   "Death rate among infected (1/day)",
